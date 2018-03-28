@@ -1,4 +1,4 @@
-package com.zia.waveview;
+package com.zia.waveview.wave;
 
 /**
  * Created by zia on 2017/9/20.

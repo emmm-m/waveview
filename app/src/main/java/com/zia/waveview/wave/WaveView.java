@@ -1,4 +1,4 @@
-package com.zia.waveview;
+package com.zia.waveview.wave;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -30,8 +30,8 @@ public class WaveView extends android.support.v7.widget.AppCompatTextView implem
     private float startX, startY, endX, endY;//左右两端高度位置
     private float assistX, assistY;//第一个波浪控制点
     private float assistX1, assistY1;//第儿个波浪控制点
-    private final int speed = 8;//第一个波浪速度
-    private final int speed1 = 7;//第二个波浪速度
+    private final int speed = 1;//第一个波浪速度
+    private final int speed1 = 3;//第二个波浪速度
     private boolean isRight = true, isRight1 = true;//控制上下移动
     private boolean isCenterRight = true;
     private boolean isUp = true, isUp1 = true;
@@ -89,22 +89,26 @@ public class WaveView extends android.support.v7.widget.AppCompatTextView implem
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.rotate(angleLast, getWidth() / 2, getHeight() / 2);
-        if (py - angleLast > 5  || angleLast - py > 5) {
+        if (py - angleLast > 5 || angleLast - py > 5) {
             doAnimation(angleLast, py, canvas);
             Log.d("zzx", "onDraw: " + angleLast);
         }
 
         if (!isInited) {
-            startX = -100;
+            startX = -150;
             startY = getHeight() / 2;
-            endX = getWidth() + 100;
+            endX = getWidth() + 150;
             endY = getHeight() / 2;
-            assistX = assistX1 = getWidth() / 4;
-            assistY = assistY1 = getHeight() / 2;
+            assistX = getWidth() / 4;
+            assistY = getHeight() / 2;
+            assistX1 = assistX * 3;
+            assistY1 = assistY;
+//            assistX = assistX1 = getWidth() / 4;
+//            assistY = assistY1 = getHeight() / 2;
             isInited = true;
         }
-        updataPath(path, assistX, assistY);
-        updataPath(path1, assistX1, assistY1);
+        updatePath(path, assistX, assistY);
+        updatePath(path1, assistX1, assistY1);
         canvas.drawPath(path, paint);
         canvas.drawPath(path1, paint1);
         changeAssistPoint();
@@ -137,12 +141,12 @@ public class WaveView extends android.support.v7.widget.AppCompatTextView implem
      * 这里控制点我设置为绕一个椭圆运动
      */
     private void changeAssistPoint() {
-        //设置振幅
-        float maxHeight = getHeight() * 2 / 5;
-        float minHeight = getHeight() * 3 / 5;
         //设置左右移动距离
-        float maxWidth = getWidth() * 3 / 4;
-        float minWidth = getWidth() / 4;
+        float maxWidth = getWidth() * 2 / 5f;
+        float minWidth = getWidth() / 5f;
+        //设置振幅
+        float maxHeight = getHeight() / 2f + minWidth / 2f;
+        float minHeight = getHeight() / 2f - minWidth / 2f;
         if (isRight) {
             assistX += speed;
             if (assistX >= maxWidth) isRight = false;
@@ -151,10 +155,10 @@ public class WaveView extends android.support.v7.widget.AppCompatTextView implem
             if (assistX <= minWidth) isRight = true;
         }
         if (isUp) {
-            assistY += (speed - 4);
+            assistY += (speed);
             if (assistY >= maxHeight) isUp = false;
         } else {
-            assistY -= (speed - 4);
+            assistY -= (speed);
             if (assistY <= minHeight) isUp = true;
         }
         if (isRight1) {
@@ -165,22 +169,22 @@ public class WaveView extends android.support.v7.widget.AppCompatTextView implem
             if (assistX1 <= minWidth) isRight1 = true;
         }
         if (isUp1) {
-            assistY1 += (speed1 - 4);
+            assistY1 += (speed1 / 2f);
             if (assistY1 >= maxHeight) isUp1 = false;
         } else {
-            assistY1 -= (speed1 - 4);
+            assistY1 -= (speed1 / 2f);
             if (assistY1 <= minHeight) isUp1 = true;
         }
+//        Log.e("assist", "assistX:" + assistX + "  assistY:" + assistY + "  assistX1:" + assistX1 + "  assistY1:" + assistY1);
     }
 
-    private void updataPath(Path path, float assistX, float assistY) {
+    private void updatePath(Path path, float assistX, float assistY) {
         path.reset();
         path.moveTo(startX, startY);
-        //path.quadTo(assistX,assistY,endX,endY);
         path.cubicTo(assistX, assistY, getOpX(assistX), getOpY(assistY), endX, endY);
         //区域为两个屏幕大小，避免旋转画布时留出空白
-        path.lineTo(getWidth() * 2, getHeight() * 2);
-        path.lineTo(-getWidth(), getHeight() * 2);
+        path.lineTo(getWidth() * 1.5f, getHeight() * 1.5f);
+        path.lineTo(-getWidth(), getHeight() * 1.5f);
         path.close();
     }
 
@@ -194,17 +198,13 @@ public class WaveView extends android.support.v7.widget.AppCompatTextView implem
         float middleX = getWidth() / 2 + centerPy;
         //增加一个变化的中心偏移量
         if (isCenterRight) {
-            centerPy = centerPy + 1;
-            if (centerPy >= 80) isCenterRight = false;
+            centerPy = centerPy + 0.3f;
+            if (centerPy >= 20) isCenterRight = false;
         } else {
-            centerPy = centerPy - 1;
-            if (centerPy <= -80) isCenterRight = true;
+            centerPy = centerPy - 0.3f;
+            if (centerPy <= -20) isCenterRight = true;
         }
-        if (x > middleX) {
-            return middleX - (x - middleX);
-        } else if (x < middleX) {
-            return middleX + (middleX - x);
-        } else return x;
+        return middleX - (x - middleX);
     }
 
     private float getOpY(float y) {

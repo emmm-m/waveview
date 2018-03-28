@@ -1,4 +1,4 @@
-package com.zia.waveview;
+package com.zia.waveview.wave;
 
 import android.animation.TypeEvaluator;
 

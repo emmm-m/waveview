@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.zia.waveview.WaveView
+    <com.zia.waveview.wave.WaveView
         android:id="@+id/waveView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
